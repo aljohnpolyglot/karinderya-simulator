@@ -23,20 +23,26 @@ function endDay(lang: Language, setEventLog: React.Dispatch<React.SetStateAction
   if (s.phase !== 'OPERATIONS') return;
   const wages = s.staff.filter(st => st.isAssigned).reduce((sum, st) => sum + st.salary, 0);
   const wasteCost = Object.values(s.preparedDishes).reduce((sum, p) => sum + p.servings * 5, 0);
+  const served = s.sessionStats.served;
+  const lost = s.sessionStats.lost;
+  const total = served + lost;
+  const serveRatio = total > 0 ? served / total : 0;
+  // Rep: +0.2 per served, -0.1 per lost, but capped so a sold-out day isn't catastrophic
+  const repChange = Math.max(-3, (served * 0.2) - (lost * 0.1));
   s.finishSimulation({
-    customersServed: s.sessionStats.served,
-    customersLost: s.sessionStats.lost,
+    customersServed: served,
+    customersLost: lost,
     revenue: s.sessionStats.revenue,
     ingredientCost: 0,
     wages,
     wasteCost,
     profit: s.sessionStats.revenue - wages - wasteCost,
-    reputationChange: (s.sessionStats.served * 0.3) - (s.sessionStats.lost * 0.5),
+    reputationChange: repChange,
     bestSellerId: undefined,
     bottleneck: undefined,
     riceSold: s.sessionStats.riceSold,
     riceShortageCount: s.sessionStats.riceShortage,
-    averageSatisfaction: s.sessionStats.served > 0 ? 75 : 0,
+    averageSatisfaction: served > 0 ? Math.round(serveRatio * 100) : 0,
     wastedServings: Object.values(s.preparedDishes).reduce((sum, p) => sum + p.servings, 0),
   });
   setEventLog(prev => [...prev, t('ops.shopClosed')]);
@@ -55,6 +61,14 @@ function simulateTick(lang: Language, setEventLog: React.Dispatch<React.SetState
   else if (st.rushStatus === 'DINNER RUSH') arrivalChance = 0.55 * demandMod;
   else if (st.rushStatus === 'BREAKFAST') arrivalChance = 0.4 * demandMod;
   else if (st.rushStatus === 'SIESTA') arrivalChance = 0.15 * demandMod;
+
+  // Auto-close when completely sold out
+  const anyDishLeft = Object.values(st.preparedDishes).some(p => p.servings > 0);
+  if (!anyDishLeft && Object.keys(st.preparedDishes).length > 0) {
+    setEventLog(prev => [...prev, `${st.hour}:${String(st.minute).padStart(2, '0')} — 🎉 ${t('ops.soldOut')}`]);
+    endDay(lang, setEventLog);
+    return false;
+  }
 
   if (Math.random() < arrivalChance) {
     const name = CUSTOMER_NAMES[Math.floor(Math.random() * CUSTOMER_NAMES.length)];

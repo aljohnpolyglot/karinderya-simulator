@@ -142,6 +142,7 @@ const dict: Record<string, Record<Language, string>> = {
   'ops.shopClosed':    { fil: '🌙 Sarado na ang tindahan!', en: '🌙 Shop is closed!' },
   'ops.ordered':       { fil: 'kumain ng', en: 'ordered' },
   'ops.leftNoFood':    { fil: 'umalis — walang ulam!', en: 'left — no food!' },
+  'ops.soldOut':       { fil: 'Ubos na ang lahat! Maaga nagsara.', en: 'All sold out! Closing early.' },
 
   // ─── Summary ───
   'summary.title':       { fil: 'Wakas ng Araw', en: 'End of Day Summary' },
