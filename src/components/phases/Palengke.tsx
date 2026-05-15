@@ -65,25 +65,55 @@ export function Palengke({ language, onNext }: Props) {
     onNext();
   };
 
-  const handleAutoBuy = (plan: Record<string, number>) => {
+  const handleAutoBuy = (plan: Record<string, number>, extraRiceKg: number) => {
     setMenuPlan(plan);
     const list = computeShoppingList(plan, activeDishes, inventory, ingredientsData);
-    const cost = list.reduce((s, item) => s + item.totalCost, 0);
+    const bigasData = ingredientsData.find(i => i.id === 'rice-raw');
+    const bigasPrice = bigasData?.currentPrice || 0;
 
-    if (list.length === 0) {
+    // Buy rice first if requested
+    if (extraRiceKg > 0 && bigasData) {
+      buyIngredient('rice-raw', extraRiceKg, bigasPrice);
+    }
+
+    // Build receipt items (rice + ingredients)
+    const receiptItems = [...list];
+    if (extraRiceKg > 0) {
+      receiptItems.unshift({
+        ingredientId: 'rice-raw',
+        icon: '🍚',
+        name: 'Bigas',
+        unit: 'kg',
+        needed: extraRiceKg,
+        inStock: 0,
+        toBuy: extraRiceKg,
+        unitCost: bigasPrice,
+        totalCost: extraRiceKg * bigasPrice,
+      });
+    }
+
+    const totalCost = receiptItems.reduce((s, item) => s + item.totalCost, 0);
+
+    if (list.length === 0 && extraRiceKg === 0) {
       setShowPlanModal(false);
       return;
     }
 
-    bulkBuyForPlan(plan);
-    const newCash = useGameStore.getState().cash;
-    setReceiptData({ items: list, totalCost: cost });
+    // Buy ingredients
+    if (list.length > 0) bulkBuyForPlan(plan);
+
+    setReceiptData({ items: receiptItems, totalCost });
     setShowPlanModal(false);
     setShowReceipt(true);
   };
 
-  const handleManual = (plan: Record<string, number>) => {
+  const handleManual = (plan: Record<string, number>, extraRiceKg: number) => {
     setMenuPlan(plan);
+    // Buy rice even in manual mode since they explicitly asked for it
+    if (extraRiceKg > 0) {
+      const bigasData = ingredientsData.find(i => i.id === 'rice-raw');
+      if (bigasData) buyIngredient('rice-raw', extraRiceKg, bigasData.currentPrice);
+    }
     setShowPlanModal(false);
   };
 

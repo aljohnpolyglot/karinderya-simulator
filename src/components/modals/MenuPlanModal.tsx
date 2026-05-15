@@ -4,8 +4,8 @@ import { createT, type Language } from '../../lib/i18n';
 
 interface Props {
   language: Language;
-  onAutoBuy: (plan: Record<string, number>) => void;
-  onManual: (plan: Record<string, number>) => void;
+  onAutoBuy: (plan: Record<string, number>, extraRiceKg: number) => void;
+  onManual: (plan: Record<string, number>, extraRiceKg: number) => void;
   onSkip: () => void;
 }
 
@@ -19,7 +19,10 @@ export function MenuPlanModal({ language, onAutoBuy, onManual, onSkip }: Props) 
 
   const riceStock = inventory['rice-raw'] || 0;
   const bigasData = ingredientsData.find(i => i.id === 'rice-raw');
+  const bigasPrice = bigasData?.currentPrice || 0;
+
   const [plan, setPlan] = useState<Record<string, number>>({});
+  const [riceKg, setRiceKg] = useState(0);
 
   const adjust = (dishId: string, delta: number) => {
     setPlan(prev => {
@@ -34,11 +37,15 @@ export function MenuPlanModal({ language, onAutoBuy, onManual, onSkip }: Props) 
 
   const totalServings = Object.values(plan).reduce((a, b) => a + b, 0);
   const shoppingList = computeShoppingList(plan, activeDishes, inventory, ingredientsData);
-  const estimatedCost = shoppingList.reduce((s, item) => s + item.totalCost, 0);
+  const ingredientCost = shoppingList.reduce((s, item) => s + item.totalCost, 0);
+  const riceCost = riceKg * bigasPrice;
+  const estimatedCost = ingredientCost + riceCost;
   const projectedRevenue = Object.entries(plan).reduce((sum, [dishId, qty]) => {
     const dish = activeDishes.find(d => d.id === dishId);
     return sum + (dish ? dish.sellingPrice * qty : 0);
   }, 0);
+
+  const hasAnythingToBuy = shoppingList.length > 0 || riceKg > 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -53,18 +60,25 @@ export function MenuPlanModal({ language, onAutoBuy, onManual, onSkip }: Props) 
 
         {/* Dish List */}
         <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
-          {/* Rice Status */}
-          <div className={`flex items-center gap-3 rounded-lg px-3 py-2.5 ${riceStock === 0 && cookedRiceServings === 0 ? 'bg-rose-50 ring-1 ring-rose-200' : 'bg-emerald-50'}`}>
+          {/* Rice — adjustable */}
+          <div className={`flex items-center gap-3 rounded-lg px-3 py-2.5 ${riceStock === 0 && cookedRiceServings === 0 && riceKg === 0 ? 'bg-rose-50 ring-1 ring-rose-200' : 'bg-amber-50'}`}>
             <span className="text-2xl">🍚</span>
             <div className="flex-1 min-w-0">
-              <div className="font-semibold text-sm text-karinderya-wood-dark">{t('menu.riceCooker')}</div>
+              <div className="font-semibold text-sm text-karinderya-wood-dark">{t('menu.rawRice')}</div>
               <div className="text-[10px] text-karinderya-wood/50">
-                {t('menu.cooked')}: {cookedRiceServings} servings · {t('menu.rawRice')}: {riceStock.toFixed(1)} kg
-                {bigasData && ` · ₱${bigasData.currentPrice}/kg`}
+                {t('common.stock')}: {riceStock.toFixed(1)} kg · {t('menu.cooked')}: {cookedRiceServings} servings
               </div>
-              {riceStock === 0 && cookedRiceServings === 0 && (
+              {bigasData && <div className="text-[10px] text-amber-700 font-semibold">₱{bigasPrice}/kg</div>}
+              {riceStock === 0 && cookedRiceServings === 0 && riceKg === 0 && (
                 <div className="text-[10px] text-rose-600 font-bold mt-0.5">⚠️ {t('menu.noRice')}</div>
               )}
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button onClick={() => setRiceKg(q => Math.max(0, q - 1))} disabled={riceKg === 0}
+                className="w-7 h-7 rounded-lg bg-karinderya-wood-dark/10 text-karinderya-wood-dark font-bold text-sm flex items-center justify-center disabled:opacity-30 cursor-pointer hover:bg-karinderya-wood-dark/20 transition-colors">−</button>
+              <span className="w-8 text-center font-bold text-xs tabular-nums">{riceKg} kg</span>
+              <button onClick={() => setRiceKg(q => q + 1)} disabled={bigasPrice * (riceKg + 1) + ingredientCost > cash}
+                className="w-7 h-7 rounded-lg bg-amber-600 text-white font-bold text-sm flex items-center justify-center disabled:opacity-30 cursor-pointer hover:bg-amber-500 transition-colors">+</button>
             </div>
           </div>
 
@@ -101,32 +115,41 @@ export function MenuPlanModal({ language, onAutoBuy, onManual, onSkip }: Props) 
 
         {/* Summary + Actions */}
         <div className="px-6 py-4 border-t border-karinderya-wood/10 space-y-3 shrink-0">
-          {totalServings > 0 && (
+          {(totalServings > 0 || riceKg > 0) && (
             <div className="bg-karinderya-cream rounded-lg p-3 space-y-1.5">
-              <div className="flex justify-between text-xs">
-                <span className="text-karinderya-wood/60">{t('common.servings')}</span>
-                <span className="font-bold text-karinderya-wood-dark">{totalServings}</span>
-              </div>
-              {shoppingList.length > 0 && (
+              {totalServings > 0 && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-karinderya-wood/60">{t('common.servings')}</span>
+                  <span className="font-bold text-karinderya-wood-dark">{totalServings}</span>
+                </div>
+              )}
+              {hasAnythingToBuy && (
                 <div className="flex justify-between text-xs">
                   <span className="text-karinderya-wood/60">{t('planModal.estimatedCost')}</span>
                   <span className="font-bold text-amber-700">₱{estimatedCost.toLocaleString()}</span>
                 </div>
               )}
-              {shoppingList.length === 0 && (
+              {!hasAnythingToBuy && totalServings > 0 && (
                 <div className="text-xs text-emerald-600 font-semibold">{t('receipt.nothingToBuy')}</div>
               )}
-              <div className="flex justify-between text-xs">
-                <span className="text-karinderya-wood/60">{t('morning.projectedRevenue')}</span>
-                <span className="font-bold text-emerald-700">₱{projectedRevenue.toLocaleString()}</span>
-              </div>
+              {totalServings > 0 && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-karinderya-wood/60">{t('morning.projectedRevenue')}</span>
+                  <span className="font-bold text-emerald-700">₱{projectedRevenue.toLocaleString()}</span>
+                </div>
+              )}
               {estimatedCost > cash && (
                 <div className="text-[10px] text-rose-600 font-bold">⚠️ {t('common.notEnoughBudget')}</div>
               )}
-              {shoppingList.length > 0 && (
+              {hasAnythingToBuy && (
                 <div className="border-t border-karinderya-wood/10 pt-2 mt-1">
                   <div className="text-[10px] font-bold text-karinderya-wood/50 uppercase mb-1">{t('common.shoppingList')}</div>
                   <div className="flex flex-wrap gap-1">
+                    {riceKg > 0 && (
+                      <span className="text-[10px] font-semibold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">
+                        🍚 Bigas x{riceKg}kg
+                      </span>
+                    )}
                     {shoppingList.map(item => (
                       <span key={item.ingredientId} className="text-[10px] font-semibold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">
                         {item.icon} {item.name} x{item.toBuy}
@@ -139,14 +162,14 @@ export function MenuPlanModal({ language, onAutoBuy, onManual, onSkip }: Props) 
           )}
 
           <div className="flex gap-2">
-            {totalServings > 0 && shoppingList.length > 0 && (
-              <button onClick={() => onAutoBuy(plan)} disabled={estimatedCost > cash}
+            {(totalServings > 0 || riceKg > 0) && hasAnythingToBuy && (
+              <button onClick={() => onAutoBuy(plan, riceKg)} disabled={estimatedCost > cash}
                 className="flex-1 bg-amber-600 text-white font-bold text-sm rounded-xl px-4 py-3 cursor-pointer disabled:opacity-40 hover:bg-amber-500 active:scale-[0.97] transition-all">
                 🛒 {t('planModal.autoBuy')} — ₱{estimatedCost.toLocaleString()}
               </button>
             )}
-            {totalServings > 0 && (
-              <button onClick={() => onManual(plan)}
+            {(totalServings > 0 || riceKg > 0) && (
+              <button onClick={() => onManual(plan, riceKg)}
                 className="flex-1 bg-karinderya-cream text-karinderya-wood-dark font-semibold text-sm rounded-xl px-4 py-3 cursor-pointer hover:bg-amber-100 transition-colors">
                 {t('planModal.manual')}
               </button>
