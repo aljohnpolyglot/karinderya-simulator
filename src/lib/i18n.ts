@@ -44,7 +44,8 @@ const dict: Record<string, Record<Language, string>> = {
   // ─── Phase Nav ───
   'phase.MORNING_BRIEFING': { fil: 'Umaga', en: 'Morning' },
   'phase.PALENGKE':         { fil: 'Palengke', en: 'Market' },
-  'phase.MENU_PLANNING':    { fil: 'Menu & Luto', en: 'Menu & Prep' },
+  'phase.MENU_PLANNING':    { fil: 'Luto', en: 'Prep' },
+  'phase.PRICING':          { fil: 'Presyo', en: 'Pricing' },
   'phase.STAFF_ASSIGNMENT': { fil: 'Staff', en: 'Staff' },
   'phase.OPERATIONS':       { fil: 'Operasyon', en: 'Operations' },
   'phase.SUMMARY':          { fil: 'Buod', en: 'Summary' },
@@ -99,8 +100,13 @@ const dict: Record<string, Record<Language, string>> = {
   'palengke.nextButton':        { fil: 'Tuloy sa Menu Planning →', en: 'Continue to Menu →' },
 
   // ─── Menu & Prep ───
-  'menu.title':             { fil: 'Menu, Luto, at Presyo', en: 'Menu, Prep & Pricing' },
-  'menu.subtitle':          { fil: 'Piliin ulam, iluto, at itakda ang presyo.', en: 'Pick dishes, cook, and set prices.' },
+  'menu.title':             { fil: 'Pagluluto', en: 'Prep & Cook' },
+  'menu.subtitle':          { fil: 'Piliin ang mga ulam at iluto.', en: 'Pick dishes and cook them.' },
+  'menu.nextButton2':       { fil: 'Tuloy sa Presyo →', en: 'Set Prices →' },
+  'pricing.title':          { fil: 'Itakda ang Presyo', en: 'Set Your Prices' },
+  'pricing.subtitle':       { fil: 'Magkano ang ibebenta mo?', en: 'How much will you charge?' },
+  'pricing.nextButton':     { fil: 'Tuloy sa Staff →', en: 'Continue to Staff →' },
+  'pricing.noPrepped':      { fil: 'Walang iniluto — bumalik sa Luto.', en: 'Nothing prepped — go back to Prep.' },
   'menu.missingIngredients':{ fil: 'Kulang ang sangkap para sa plano mo', en: 'Missing ingredients for your plan' },
   'menu.itemsShort':        { fil: '{0} sangkap kulang', en: '{0} items short' },
   'menu.buyMissing':        { fil: 'Bumili ng Kulang', en: 'Buy Missing' },
@@ -217,7 +223,7 @@ export const WEATHER_ICONS: Record<string, string> = {
 };
 
 export const PHASE_ICONS: Record<string, string> = {
-  MORNING_BRIEFING: '🌅', PALENGKE: '🛒', MENU_PLANNING: '🍳',
+  MORNING_BRIEFING: '🌅', PALENGKE: '🛒', MENU_PLANNING: '🍳', PRICING: '💰',
   STAFF_ASSIGNMENT: '👥', OPERATIONS: '🏪', SUMMARY: '📊', STORE_CLOSED: '🌙',
 };
 

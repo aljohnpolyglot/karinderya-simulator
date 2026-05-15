@@ -5,6 +5,7 @@ import { BottomNav } from './ui/BottomNav';
 import { MorningBriefing } from './phases/MorningBriefing';
 import { Palengke } from './phases/Palengke';
 import { MenuPlanning } from './phases/MenuPlanning';
+import { PricingPhase } from './phases/PricingPhase';
 import { StaffAssignment } from './phases/StaffAssignment';
 import { Operations } from './phases/Operations';
 import { Summary } from './phases/Summary';
@@ -25,6 +26,7 @@ export function Game({ language, onQuit }: Props) {
       case 'MORNING_BRIEFING': return <MorningBriefing {...props} />;
       case 'PALENGKE':         return <Palengke {...props} />;
       case 'MENU_PLANNING':    return <MenuPlanning {...props} />;
+      case 'PRICING':          return <PricingPhase {...props} />;
       case 'STAFF_ASSIGNMENT': return <StaffAssignment {...props} />;
       case 'OPERATIONS':       return <Operations {...props} />;
       case 'SUMMARY':          return <Summary {...props} />;

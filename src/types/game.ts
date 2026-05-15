@@ -1,5 +1,5 @@
 
-export type GamePhase = 'MORNING_BRIEFING' | 'PALENGKE' | 'MENU_PLANNING' | 'STAFF_ASSIGNMENT' | 'OPERATIONS' | 'SUMMARY' | 'STORE_CLOSED';
+export type GamePhase = 'MORNING_BRIEFING' | 'PALENGKE' | 'MENU_PLANNING' | 'PRICING' | 'STAFF_ASSIGNMENT' | 'OPERATIONS' | 'SUMMARY' | 'STORE_CLOSED';
 
 export type Weather = 'SUNNY' | 'RAINY' | 'CLOUDY' | 'STORM';
 export type DayOfWeek = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';

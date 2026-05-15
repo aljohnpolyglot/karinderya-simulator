@@ -29,13 +29,11 @@ export function MenuPlanning({ language, onNext }: Props) {
   const activeDishes = useGameStore(s => s.activeDishes);
   const ingredientsData = useGameStore(s => s.ingredientsData);
   const inventory = useGameStore(s => s.inventory);
-  const cash = useGameStore(s => s.cash);
   const prepDishes = useGameStore(s => s.prepDishes);
-  const setDishPrice = useGameStore(s => s.setDishPrice);
-  const dishPrices = useGameStore(s => s.dishPrices);
   const cookedRiceServings = useGameStore(s => s.cookedRiceServings);
   const cookRice = useGameStore(s => s.cookRice);
   const isRiceCooking = useGameStore(s => s.isRiceCooking);
+  const cash = useGameStore(s => s.cash);
   const buyIngredient = useGameStore(s => s.buyIngredient);
   const menuPlan = useGameStore(s => s.menuPlan);
   const riceStock = inventory['rice-raw'] || 0;
@@ -70,7 +68,7 @@ export function MenuPlanning({ language, onNext }: Props) {
     });
   });
 
-  // Split dishes into cookable and uncookable
+  // Split dishes
   const cookableDishes: Dish[] = [];
   const uncookableDishes: Dish[] = [];
   activeDishes.forEach(dish => {
@@ -99,21 +97,6 @@ export function MenuPlanning({ language, onNext }: Props) {
       return sum + (data ? data.currentPrice * ing.quantity : 0);
     }, 0);
 
-  const getEffectivePrice = (dish: Dish) => dishPrices[dish.id] || dish.sellingPrice;
-
-  const projectedRevenue = Object.entries(plan).reduce((sum, [dishId, qty]) => {
-    const dish = activeDishes.find(d => d.id === dishId);
-    return sum + (dish ? getEffectivePrice(dish) * qty : 0);
-  }, 0);
-
-  const totalCost = Object.entries(plan).reduce((sum, [dishId, qty]) => {
-    if (qty <= 0) return sum;
-    const dish = activeDishes.find(d => d.id === dishId);
-    return sum + (dish ? getCostPerServing(dish) * qty : 0);
-  }, 0);
-
-  const plannedDishes = activeDishes.filter(d => (plan[d.id] || 0) > 0);
-
   const bigasData = ingredientsData.find(i => i.id === 'rice-raw');
   const bigasPrice = bigasData?.currentPrice || 0;
 
@@ -137,7 +120,7 @@ export function MenuPlanning({ language, onNext }: Props) {
     onNext();
   };
 
-  // Pantry items: only show ingredients with stock > 0
+  // Pantry items
   const pantryItems = ingredientsData
     .filter(i => (inventory[i.id] || 0) > 0)
     .map(i => ({
@@ -221,31 +204,16 @@ export function MenuPlanning({ language, onNext }: Props) {
 
               return (
                 <div key={dish.id} className="rounded-xl p-4 bg-karinderya-cream">
-                  <div className="flex gap-3 items-start">
+                  <div className="flex gap-3 items-center">
                     {dish.imageUrl ? (
-                      <img src={dish.imageUrl} alt={dish.name} className="w-14 h-14 rounded-lg object-cover shrink-0" />
+                      <img src={dish.imageUrl} alt={dish.name} className="w-12 h-12 rounded-lg object-cover shrink-0" />
                     ) : (
-                      <div className="w-14 h-14 rounded-lg bg-karinderya-wood/10 flex items-center justify-center text-xl shrink-0">🍽️</div>
+                      <div className="w-12 h-12 rounded-lg bg-karinderya-wood/10 flex items-center justify-center text-xl shrink-0">🍽️</div>
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-sm text-karinderya-wood-dark">{dish.name}</div>
-                      <div className="flex gap-3 text-xs mt-0.5">
-                        <span className="text-karinderya-wood/50">{t('common.cost')}: ₱{cost.toFixed(0)}</span>
-                        <span className="text-amber-700">{t('common.sell')}: ₱{getEffectivePrice(dish)}</span>
-                        <span className="text-emerald-700">{t('common.profit')}: ₱{(getEffectivePrice(dish) - cost).toFixed(0)}</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1 mt-1.5">
-                        {dish.ingredients.map(ing => {
-                          const data = ingredientsData.find(i => i.id === ing.ingredientId);
-                          const remaining = remainingInventory[ing.ingredientId] || 0;
-                          const hasEnough = remaining >= 0;
-                          return (
-                            <span key={ing.ingredientId}
-                              className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${hasEnough ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
-                              {data?.icon} {data?.shortName || ing.ingredientId}
-                            </span>
-                          );
-                        })}
+                      <div className="text-[10px] text-karinderya-wood/50">
+                        ₱{cost.toFixed(0)} {t('common.cost')}/serving · max {maxAvailable + qty}
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
@@ -256,7 +224,6 @@ export function MenuPlanning({ language, onNext }: Props) {
                         className="w-8 h-8 rounded-lg bg-amber-600 text-white font-bold text-lg flex items-center justify-center disabled:opacity-30 cursor-pointer hover:bg-amber-500 transition-colors">+</button>
                     </div>
                   </div>
-                  <div className="text-[10px] text-karinderya-wood/40 mt-1.5 text-right">max: {maxAvailable + qty} servings</div>
                 </div>
               );
             })}
@@ -271,89 +238,28 @@ export function MenuPlanning({ language, onNext }: Props) {
               </summary>
               <div className="mt-2 space-y-2">
                 {uncookableDishes.map(dish => (
-                  <div key={dish.id} className="rounded-xl p-3 bg-karinderya-cream/40 opacity-50">
-                    <div className="flex gap-3 items-center">
-                      {dish.imageUrl ? (
-                        <img src={dish.imageUrl} alt={dish.name} className="w-10 h-10 rounded-lg object-cover shrink-0 grayscale" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-lg bg-karinderya-wood/10 flex items-center justify-center text-lg shrink-0">🍽️</div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-sm text-karinderya-wood/50 truncate">{dish.name}</div>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {dish.ingredients.map(ing => {
-                            const data = ingredientsData.find(i => i.id === ing.ingredientId);
-                            const stock = inventory[ing.ingredientId] || 0;
-                            const hasEnough = stock >= ing.quantity;
-                            return (
-                              <span key={ing.ingredientId}
-                                className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${hasEnough ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
-                                {data?.icon} {data?.shortName || ing.ingredientId}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
+                  <div key={dish.id} className="rounded-xl p-3 bg-karinderya-cream/40 opacity-50 flex gap-3 items-center">
+                    {dish.imageUrl ? (
+                      <img src={dish.imageUrl} alt={dish.name} className="w-10 h-10 rounded-lg object-cover shrink-0 grayscale" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-karinderya-wood/10 flex items-center justify-center text-lg shrink-0">🍽️</div>
+                    )}
+                    <span className="font-semibold text-sm text-karinderya-wood/50 truncate">{dish.name}</span>
                   </div>
                 ))}
               </div>
             </details>
           )}
 
-          {/* Pricing */}
-          {plannedDishes.length > 0 && (
-            <div>
-              <h2 className="text-sm font-bold text-karinderya-wood/50 uppercase mb-3">💰 {t('menu.setPrices')}</h2>
-              <div className="space-y-2">
-                {plannedDishes.map(dish => {
-                  const cost = getCostPerServing(dish);
-                  const price = getEffectivePrice(dish);
-                  const margin = ((price - cost) / price * 100);
-                  return (
-                    <div key={dish.id} className="bg-karinderya-cream rounded-xl p-3 flex items-center gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-sm text-karinderya-wood-dark">{dish.name}</div>
-                        <div className="text-[10px] text-karinderya-wood/50">
-                          {t('menu.costLabel')}: ₱{cost.toFixed(0)} · {t('common.margin')}: {margin.toFixed(0)}%
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-xs text-karinderya-wood/50">₱</span>
-                        <button onClick={() => setDishPrice(dish.id, price - 5)}
-                          className="w-7 h-7 rounded-lg bg-karinderya-wood-dark/10 text-karinderya-wood-dark font-bold text-sm flex items-center justify-center cursor-pointer hover:bg-karinderya-wood-dark/20 transition-colors">−</button>
-                        <span className="w-12 text-center font-bold text-lg tabular-nums text-amber-700">{price}</span>
-                        <button onClick={() => setDishPrice(dish.id, price + 5)}
-                          className="w-7 h-7 rounded-lg bg-amber-600 text-white font-bold text-sm flex items-center justify-center cursor-pointer hover:bg-amber-500 transition-colors">+</button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Totals */}
-          <div className="bg-karinderya-wood-dark/5 rounded-xl p-4">
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <div className="text-[10px] font-bold text-karinderya-wood/50 uppercase">{t('common.servings')}</div>
-                <div className="text-lg font-bold text-karinderya-wood-dark">{totalServings}</div>
-              </div>
-              <div>
-                <div className="text-[10px] font-bold text-karinderya-wood/50 uppercase">{t('common.revenue')}</div>
-                <div className="text-lg font-bold text-emerald-700">₱{projectedRevenue.toLocaleString()}</div>
-              </div>
-              <div>
-                <div className="text-[10px] font-bold text-karinderya-wood/50 uppercase">{t('common.profit')}</div>
-                <div className="text-lg font-bold text-amber-700">₱{(projectedRevenue - totalCost).toFixed(0)}</div>
-              </div>
-            </div>
+          {/* Total */}
+          <div className="bg-karinderya-wood-dark/5 rounded-xl p-4 text-center">
+            <div className="text-[10px] font-bold text-karinderya-wood/50 uppercase">{t('common.servings')}</div>
+            <div className="text-2xl font-bold text-karinderya-wood-dark">{totalServings}</div>
           </div>
 
           <button onClick={handleContinue}
             className="w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white font-bold rounded-xl px-6 py-4 text-lg shadow-lg hover:from-amber-500 hover:to-orange-500 active:scale-[0.98] transition-all cursor-pointer">
-            {t('menu.nextButton')}
+            {t('menu.nextButton2')}
           </button>
         </div>
 

@@ -3,7 +3,7 @@ import type { GamePhase } from '../../types/game';
 import { PHASE_ICONS, createT, type Language } from '../../lib/i18n';
 
 const PHASE_ORDER: GamePhase[] = [
-  'MORNING_BRIEFING', 'PALENGKE', 'MENU_PLANNING',
+  'MORNING_BRIEFING', 'PALENGKE', 'MENU_PLANNING', 'PRICING',
   'STAFF_ASSIGNMENT', 'OPERATIONS', 'SUMMARY', 'STORE_CLOSED',
 ];
 

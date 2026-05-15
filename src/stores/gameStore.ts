@@ -209,7 +209,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   nextPhase: () => {
     const { phase } = get();
-    const phases: GamePhase[] = ['MORNING_BRIEFING', 'PALENGKE', 'MENU_PLANNING', 'STAFF_ASSIGNMENT', 'OPERATIONS', 'SUMMARY', 'STORE_CLOSED'];
+    const phases: GamePhase[] = ['MORNING_BRIEFING', 'PALENGKE', 'MENU_PLANNING', 'PRICING', 'STAFF_ASSIGNMENT', 'OPERATIONS', 'SUMMARY', 'STORE_CLOSED'];
     const currentIndex = phases.indexOf(phase);
     const nextIndex = (currentIndex + 1) % phases.length;
     const nextPhaseName = phases[nextIndex];
