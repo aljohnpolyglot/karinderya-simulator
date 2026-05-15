@@ -87,6 +87,7 @@ const dict: Record<string, Record<Language, string>> = {
   'morning.planDesc':         { fil: 'Piliin ang mga ulam at servings. Auto-compute ang shopping list sa Palengke.', en: 'Pick dishes & servings. Shopping list auto-computes for Palengke.' },
   'morning.needToBuy':        { fil: 'Kailangan bilhin', en: 'Need to buy' },
   'morning.projectedRevenue': { fil: 'Projected na benta', en: 'Projected revenue' },
+  'morning.nextStep':         { fil: 'Susunod →', en: 'Next →' },
   'morning.nextButton':       { fil: 'Tuloy sa Palengke →', en: 'Go to Market →' },
 
   // ─── Palengke ───

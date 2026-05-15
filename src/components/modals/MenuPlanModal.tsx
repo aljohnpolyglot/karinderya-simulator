@@ -98,7 +98,7 @@ export function MenuPlanModal({ language, onAutoBuy, onManual, onSkip }: Props) 
                 <div className="flex-1 min-w-0">
                   <div className="font-semibold text-sm text-karinderya-wood-dark truncate">{dish.name}</div>
                   <div className="text-[10px] text-karinderya-wood/50">
-                    ₱{cost.toFixed(0)} {t('common.cost')} · ₱{dish.sellingPrice} {t('common.sell')}
+                    ₱{dish.sellingPrice} {t('common.sell')} · <span className={`font-bold ${dish.sellingPrice - cost > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>₱{(dish.sellingPrice - cost).toFixed(0)} {t('common.profit')}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">

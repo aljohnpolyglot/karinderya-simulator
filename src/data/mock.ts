@@ -53,9 +53,9 @@ export const INITIAL_INGREDIENTS: Ingredient[] = [
 
 // Quantities are PER SERVING, based on real recipes from recipes.json
 // Pork Adobo: 0.5kg pork / 4 servings = 0.125kg per serving
-// Sinigang: 1kg pork / 5 servings = 0.2kg per serving, veggies split across 5
-// Sisig: 2kg pork / 4 servings = 0.5kg per serving (heavy dish!)
-// Tapa: 1kg beef / 4 servings = 0.25kg per serving
+// Sinigang: 1kg pork / 6 servings = 0.17kg per serving, veggies split across 6
+// Sisig: 1kg pork face/belly / 5 servings = 0.2kg per serving (chopped small)
+// Tapa: 1kg beef / 6 servings = 0.15kg per serving (sliced thin)
 // Bangus: 0.5kg bangus / 4 servings = 0.125kg per serving
 
 export const INITIAL_DISHES: Dish[] = [
@@ -85,15 +85,15 @@ export const INITIAL_DISHES: Dish[] = [
     recipeId: '110188',
     imageUrl: RECIPE_IMG('110188'),
     ingredients: [
-      { ingredientId: 'pork', quantity: 0.2 },
-      { ingredientId: 'sibuyas', quantity: 0.05 },
-      { ingredientId: 'kamatis', quantity: 0.06 },
-      { ingredientId: 'kangkong', quantity: 0.2 },
-      { ingredientId: 'sitaw', quantity: 0.1 },
-      { ingredientId: 'labanos', quantity: 0.06 },
-      { ingredientId: 'okra', quantity: 0.04 },
-      { ingredientId: 'sili', quantity: 0.05 },
-      { ingredientId: 'sinigang-mix', quantity: 0.2 },
+      { ingredientId: 'pork', quantity: 0.17 },
+      { ingredientId: 'sibuyas', quantity: 0.04 },
+      { ingredientId: 'kamatis', quantity: 0.05 },
+      { ingredientId: 'kangkong', quantity: 0.15 },
+      { ingredientId: 'sitaw', quantity: 0.08 },
+      { ingredientId: 'labanos', quantity: 0.05 },
+      { ingredientId: 'okra', quantity: 0.03 },
+      { ingredientId: 'sili', quantity: 0.04 },
+      { ingredientId: 'sinigang-mix', quantity: 0.15 },
     ],
     sellingPrice: 110,
     popularity: 0.85,
@@ -107,14 +107,14 @@ export const INITIAL_DISHES: Dish[] = [
     recipeId: '152601',
     imageUrl: RECIPE_IMG('152601'),
     ingredients: [
-      { ingredientId: 'pork', quantity: 0.5 },
-      { ingredientId: 'atay-manok', quantity: 0.125 },
-      { ingredientId: 'sibuyas', quantity: 0.06 },
-      { ingredientId: 'bawang', quantity: 0.015 },
-      { ingredientId: 'sili', quantity: 0.05 },
-      { ingredientId: 'calamansi', quantity: 0.1 },
-      { ingredientId: 'toyo', quantity: 0.03 },
-      { ingredientId: 'cooking-oil', quantity: 0.05 },
+      { ingredientId: 'pork', quantity: 0.2 },
+      { ingredientId: 'atay-manok', quantity: 0.05 },
+      { ingredientId: 'sibuyas', quantity: 0.04 },
+      { ingredientId: 'bawang', quantity: 0.01 },
+      { ingredientId: 'sili', quantity: 0.03 },
+      { ingredientId: 'calamansi', quantity: 0.06 },
+      { ingredientId: 'toyo', quantity: 0.02 },
+      { ingredientId: 'cooking-oil', quantity: 0.03 },
     ],
     sellingPrice: 140,
     popularity: 0.95,
@@ -128,11 +128,11 @@ export const INITIAL_DISHES: Dish[] = [
     recipeId: '110461',
     imageUrl: RECIPE_IMG('110461'),
     ingredients: [
-      { ingredientId: 'beef', quantity: 0.25 },
-      { ingredientId: 'toyo', quantity: 0.04 },
-      { ingredientId: 'bawang', quantity: 0.015 },
-      { ingredientId: 'asukal', quantity: 0.015 },
-      { ingredientId: 'cooking-oil', quantity: 0.03 },
+      { ingredientId: 'beef', quantity: 0.15 },
+      { ingredientId: 'toyo', quantity: 0.03 },
+      { ingredientId: 'bawang', quantity: 0.01 },
+      { ingredientId: 'asukal', quantity: 0.01 },
+      { ingredientId: 'cooking-oil', quantity: 0.02 },
     ],
     sellingPrice: 115,
     popularity: 0.8,
