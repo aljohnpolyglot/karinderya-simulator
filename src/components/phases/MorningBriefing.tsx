@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { useGameStore, computeShoppingList } from '../../stores/gameStore';
+import { useGameStore } from '../../stores/gameStore';
 import { createT, WEATHER_ICONS, type Language } from '../../lib/i18n';
 
 interface Props {
@@ -10,14 +9,9 @@ interface Props {
 export function MorningBriefing({ language, onNext }: Props) {
   const { day, dayOfWeek, dailyConditions, cash, ingredientsData } = useGameStore();
   const activeDishes = useGameStore(s => s.activeDishes);
-  const inventory = useGameStore(s => s.inventory);
-  const setMenuPlan = useGameStore(s => s.setMenuPlan);
   const t = createT(language);
   const w = dailyConditions.weather;
   const demandMod = dailyConditions.modifiers.demand;
-
-  const [plan, setPlan] = useState<Record<string, number>>({});
-  const [showPlanner, setShowPlanner] = useState(false);
 
   const priceChanges = ingredientsData
     .filter(i => i.currentPrice !== i.basePrice)
@@ -30,31 +24,6 @@ export function MorningBriefing({ language, onNext }: Props) {
     }));
 
   const hotDishes = Object.entries(dailyConditions.modifiers.specificDishPopularity || {});
-
-  const shoppingList = computeShoppingList(plan, activeDishes, inventory, ingredientsData);
-  const estimatedCost = shoppingList.reduce((s, item) => s + item.totalCost, 0);
-
-  const totalServings = Object.values(plan).reduce((a, b) => a + b, 0);
-  const projectedRevenue = Object.entries(plan).reduce((sum, [dishId, qty]) => {
-    const dish = activeDishes.find(d => d.id === dishId);
-    return sum + (dish ? dish.sellingPrice * qty : 0);
-  }, 0);
-
-  const handleContinue = () => {
-    setMenuPlan(plan);
-    onNext();
-  };
-
-  const adjust = (dishId: string, delta: number) => {
-    setPlan(prev => {
-      const next = Math.max(0, (prev[dishId] || 0) + delta);
-      if (next === 0) {
-        const { [dishId]: _, ...rest } = prev;
-        return rest;
-      }
-      return { ...prev, [dishId]: next };
-    });
-  };
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
@@ -148,90 +117,7 @@ export function MorningBriefing({ language, onNext }: Props) {
         </div>
       </div>
 
-      {/* Menu Planner */}
-      <div className="bg-karinderya-cream rounded-xl overflow-hidden">
-        <button onClick={() => setShowPlanner(!showPlanner)}
-          className="w-full flex items-center justify-between p-4 cursor-pointer hover:bg-amber-100/50 transition-colors">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">📋</span>
-            <span className="font-bold text-sm text-karinderya-wood-dark">{t('morning.planMenu')}</span>
-            {totalServings > 0 && (
-              <span className="text-[10px] bg-amber-600 text-white px-2 py-0.5 rounded-full font-bold">
-                {totalServings} {t('common.servings').toLowerCase()}
-              </span>
-            )}
-          </div>
-          <span className="text-karinderya-wood/40 text-sm">{showPlanner ? '▲' : '▼'}</span>
-        </button>
-
-        {showPlanner && (
-          <div className="px-4 pb-4 space-y-3">
-            <p className="text-xs text-karinderya-wood/60">{t('morning.planDesc')}</p>
-
-            <div className="space-y-2">
-              {activeDishes.map(dish => {
-                const qty = plan[dish.id] || 0;
-                const cost = dish.ingredients.reduce((sum, ing) => {
-                  const data = ingredientsData.find(i => i.id === ing.ingredientId);
-                  return sum + (data ? data.currentPrice * ing.quantity : 0);
-                }, 0);
-                return (
-                  <div key={dish.id} className="flex items-center gap-3 bg-white/60 rounded-lg px-3 py-2">
-                    {dish.imageUrl ? (
-                      <img src={dish.imageUrl} alt={dish.name} className="w-9 h-9 rounded-lg object-cover shrink-0" />
-                    ) : (
-                      <div className="w-9 h-9 rounded-lg bg-karinderya-wood/10 flex items-center justify-center text-sm shrink-0">🍽️</div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-xs text-karinderya-wood-dark truncate">{dish.name}</div>
-                      <div className="text-[10px] text-karinderya-wood/50">
-                        ₱{cost.toFixed(0)} {t('common.cost')} · ₱{dish.sellingPrice} {t('common.sell')}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <button onClick={() => adjust(dish.id, -1)} disabled={qty === 0}
-                        className="w-7 h-7 rounded-lg bg-karinderya-wood-dark/10 text-karinderya-wood-dark font-bold text-sm flex items-center justify-center disabled:opacity-30 cursor-pointer hover:bg-karinderya-wood-dark/20 transition-colors">−</button>
-                      <span className="w-6 text-center font-bold text-xs tabular-nums">{qty}</span>
-                      <button onClick={() => adjust(dish.id, 1)}
-                        className="w-7 h-7 rounded-lg bg-amber-600 text-white font-bold text-sm flex items-center justify-center cursor-pointer hover:bg-amber-500 transition-colors">+</button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {totalServings > 0 && (
-              <div className="bg-white/60 rounded-lg p-3 space-y-2">
-                <div className="flex justify-between text-xs">
-                  <span className="text-karinderya-wood/60">{t('morning.needToBuy')}</span>
-                  <span className="font-bold text-amber-700">₱{estimatedCost.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-karinderya-wood/60">{t('morning.projectedRevenue')}</span>
-                  <span className="font-bold text-emerald-700">₱{projectedRevenue.toLocaleString()}</span>
-                </div>
-                {estimatedCost > cash && (
-                  <div className="text-[10px] text-rose-600 font-bold">⚠️ {t('common.notEnoughBudget')}</div>
-                )}
-                {shoppingList.length > 0 && (
-                  <div className="border-t border-karinderya-wood/10 pt-2 mt-2">
-                    <div className="text-[10px] font-bold text-karinderya-wood/50 uppercase mb-1">{t('common.shoppingList')}</div>
-                    <div className="flex flex-wrap gap-1">
-                      {shoppingList.map(item => (
-                        <span key={item.ingredientId} className="text-[10px] font-semibold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">
-                          {item.icon} {item.name} x{item.toBuy}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      <button onClick={handleContinue}
+      <button onClick={onNext}
         className="w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white font-bold rounded-xl px-6 py-4 text-lg shadow-lg hover:from-amber-500 hover:to-orange-500 active:scale-[0.98] transition-all cursor-pointer">
         {t('morning.nextButton')}
       </button>

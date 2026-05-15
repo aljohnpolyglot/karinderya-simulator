@@ -164,6 +164,32 @@ const dict: Record<string, Record<Language, string>> = {
   'night.rep':        { fil: 'Reputasyon', en: 'Rep' },
   'night.nextButton': { fil: '☀️ Bagong Umaga →', en: '☀️ New Morning →' },
 
+  // ─── Plan Modal (Pre-Palengke) ───
+  'planModal.title':        { fil: 'Ano lulutuin natin ngayon?', en: 'What are we cooking today?' },
+  'planModal.subtitle':     { fil: 'Pumili ng mga ulam at servings. Bibilhin namin ang kailangan.', en: 'Pick dishes and servings. We\'ll buy what you need.' },
+  'planModal.autoBuy':      { fil: 'Auto-buy', en: 'Auto-buy' },
+  'planModal.manual':       { fil: 'Manu-mano', en: 'Manual Shopping' },
+  'planModal.skipPlan':     { fil: 'Walang plano, diretsyo sa palengke', en: 'No plan, go straight to market' },
+  'planModal.estimatedCost':{ fil: 'Tinatayang gastos', en: 'Estimated cost' },
+
+  // ─── Receipt Modal ───
+  'receipt.title':         { fil: 'Resibo', en: 'Receipt' },
+  'receipt.totalDeducted': { fil: 'Kabuuang binayaran', en: 'Total Paid' },
+  'receipt.remaining':     { fil: 'Natirang pera', en: 'Remaining Cash' },
+  'receipt.confirm':       { fil: 'Sige!', en: 'OK' },
+  'receipt.nothingToBuy':  { fil: 'Kumpleto na — walang kailangang bilhin!', en: 'All stocked — nothing to buy!' },
+
+  // ─── Menu & Prep (additions) ───
+  'menu.pantry':          { fil: 'Pantry', en: 'Pantry' },
+  'menu.remaining':       { fil: 'Natitira', en: 'Remaining' },
+  'menu.buyBigas':        { fil: 'Bumili ng Bigas', en: 'Buy Rice' },
+  'menu.buyBigasTitle':   { fil: 'Bumili ng Bigas', en: 'Buy Rice' },
+  'menu.buyBigasDesc':    { fil: 'Presyo ngayon sa palengke:', en: 'Current market price:' },
+  'menu.riceDone':        { fil: 'Luto na!', en: 'Done!' },
+  'menu.riceEmpty':       { fil: 'Walang laman', en: 'Empty' },
+  'menu.noCookable':      { fil: 'Walang malulutong ulam — bumili muna ng sangkap!', en: 'No cookable dishes — buy ingredients first!' },
+  'menu.uncookableLabel': { fil: 'Kulang ang sangkap', en: 'Insufficient ingredients' },
+
   // ─── Cookbook ───
   'cookbook.title':             { fil: 'Libro ng Resipe', en: 'Cookbook' },
   'cookbook.ingredientsPerServing': { fil: 'Sangkap per serving', en: 'Ingredients per serving' },

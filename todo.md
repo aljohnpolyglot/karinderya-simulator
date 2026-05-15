@@ -30,6 +30,10 @@
 - [ ] Map recipe ingredients to game ingredient system
 
 ## Phase 3: Staff & Cooks
+- [ ] Staff hiring system — browse candidates with random stats, pay hiring fee
+- [ ] Tiredness system — stamina decreases with workload, affects speed/quality
+- [ ] Mood system — morale affected by events, tips, rest quality
+- [ ] Staff mood indicators in assignment screen
 - [ ] Cook specialties/niches (e.g., Nanay Rose = adobo expert, Mang Kiko = grilled dishes)
 - [ ] Specialty bonuses — faster prep, better quality for matching dishes
 - [ ] More staff roles: Head Cook, Line Cook, Prep Cook

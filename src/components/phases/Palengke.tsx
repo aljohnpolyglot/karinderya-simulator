@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useGameStore, computeShoppingList } from '../../stores/gameStore';
 import { Cookbook } from '../Cookbook';
+import { MenuPlanModal } from '../modals/MenuPlanModal';
+import { ReceiptModal } from '../modals/ReceiptModal';
 import { createT, CATEGORIES, type Language } from '../../lib/i18n';
 
 interface Props {
@@ -15,16 +17,19 @@ export function Palengke({ language, onNext }: Props) {
   const activeDishes = useGameStore(s => s.activeDishes);
   const buyIngredient = useGameStore(s => s.buyIngredient);
   const menuPlan = useGameStore(s => s.menuPlan);
+  const setMenuPlan = useGameStore(s => s.setMenuPlan);
   const bulkBuyForPlan = useGameStore(s => s.bulkBuyForPlan);
   const t = createT(language);
+
+  const [showPlanModal, setShowPlanModal] = useState(true);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [receiptData, setReceiptData] = useState<{ items: ReturnType<typeof computeShoppingList>; totalCost: number } | null>(null);
   const [filter, setFilter] = useState('ALL');
   const [cart, setCart] = useState<Record<string, number>>({});
   const [showCookbook, setShowCookbook] = useState(false);
-  const [showList, setShowList] = useState(true);
 
   const hasPlan = Object.values(menuPlan).some(v => v > 0);
   const shoppingList = computeShoppingList(menuPlan, activeDishes, inventory, ingredientsData);
-  const shoppingCost = shoppingList.reduce((s, item) => s + item.totalCost, 0);
   const neededMap = new Map(shoppingList.map(item => [item.ingredientId, item]));
 
   const filtered = filter === 'ALL' ? ingredientsData : ingredientsData.filter(i => i.category === filter);
@@ -60,7 +65,36 @@ export function Palengke({ language, onNext }: Props) {
     onNext();
   };
 
-  const handleBulkBuy = () => { bulkBuyForPlan(); setShowList(false); };
+  const handleAutoBuy = (plan: Record<string, number>) => {
+    setMenuPlan(plan);
+    const list = computeShoppingList(plan, activeDishes, inventory, ingredientsData);
+    const cost = list.reduce((s, item) => s + item.totalCost, 0);
+
+    if (list.length === 0) {
+      setShowPlanModal(false);
+      return;
+    }
+
+    bulkBuyForPlan(plan);
+    const newCash = useGameStore.getState().cash;
+    setReceiptData({ items: list, totalCost: cost });
+    setShowPlanModal(false);
+    setShowReceipt(true);
+  };
+
+  const handleManual = (plan: Record<string, number>) => {
+    setMenuPlan(plan);
+    setShowPlanModal(false);
+  };
+
+  const handleSkip = () => {
+    setShowPlanModal(false);
+  };
+
+  const handleReceiptConfirm = () => {
+    setShowReceipt(false);
+    setReceiptData(null);
+  };
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-5">
@@ -85,15 +119,12 @@ export function Palengke({ language, onNext }: Props) {
         </div>
       </div>
 
-      {/* Shopping List from Plan */}
-      {hasPlan && shoppingList.length > 0 && showList && (
+      {/* Shopping List reminder (after auto-buy or manual plan) */}
+      {!showPlanModal && hasPlan && shoppingList.length > 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">📋</span>
-              <span className="font-bold text-sm text-amber-900">{t('palengke.shoppingListTitle')}</span>
-            </div>
-            <button onClick={() => setShowList(false)} className="text-xs text-amber-600 hover:text-amber-800 cursor-pointer">✕</button>
+          <div className="flex items-center gap-2">
+            <span className="text-lg">📋</span>
+            <span className="font-bold text-sm text-amber-900">{t('palengke.shoppingListTitle')}</span>
           </div>
           <div className="grid grid-cols-2 gap-1.5">
             {shoppingList.map(item => (
@@ -105,20 +136,10 @@ export function Palengke({ language, onNext }: Props) {
               </div>
             ))}
           </div>
-          <div className="flex items-center justify-between pt-2 border-t border-amber-200">
-            <div className="text-sm font-bold text-amber-900">{t('common.total')}: ₱{shoppingCost.toLocaleString()}</div>
-            <button onClick={handleBulkBuy} disabled={shoppingCost > cash}
-              className="bg-amber-600 text-white font-bold text-sm rounded-xl px-5 py-2.5 cursor-pointer disabled:opacity-40 hover:bg-amber-500 active:scale-[0.97] transition-all">
-              🛒 {t('palengke.buyAll')} — ₱{shoppingCost.toLocaleString()}
-            </button>
-          </div>
-          {shoppingCost > cash && (
-            <div className="text-[10px] text-rose-600 font-bold text-right">⚠️ {t('common.notEnoughBudget')}</div>
-          )}
         </div>
       )}
 
-      {hasPlan && shoppingList.length === 0 && showList && (
+      {!showPlanModal && hasPlan && shoppingList.length === 0 && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-center gap-3">
           <span className="text-2xl">✅</span>
           <div>
@@ -196,6 +217,12 @@ export function Palengke({ language, onNext }: Props) {
       </div>
 
       {showCookbook && <Cookbook language={language} onClose={() => setShowCookbook(false)} />}
+      {showPlanModal && (
+        <MenuPlanModal language={language} onAutoBuy={handleAutoBuy} onManual={handleManual} onSkip={handleSkip} />
+      )}
+      {showReceipt && receiptData && (
+        <ReceiptModal language={language} items={receiptData.items} totalCost={receiptData.totalCost} remainingCash={cash} onConfirm={handleReceiptConfirm} />
+      )}
     </div>
   );
 }
