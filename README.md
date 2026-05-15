@@ -1,7 +1,3 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
-
 # Karinderya Simulator
 
 > *"A cozy-but-stressful Filipino neighborhood restaurant management simulator where players gradually become part of a living community."*
@@ -13,8 +9,7 @@
 **Prerequisites:** Node.js
 
 1. Install dependencies: `npm install`
-2. Set the `GEMINI_API_KEY` in `.env.local` to your Gemini API key
-3. Run the app: `npm run dev`
+2. Run the app: `npm run dev`
 
 ---
 
@@ -22,13 +17,7 @@
 
 ### What This Game Is
 
-The game evolved from:
-
-> "Filipino cooking game"
-
-into:
-
-> **"Filipino community + restaurant management simulator."**
+> **Filipino community + restaurant management simulator.**
 
 **Main inspirations:**
 - Football Manager
@@ -39,7 +28,7 @@ into:
 
 **NOT primarily:** Diner Dash, Papa's Pizzeria
 
-**Final direction:** management-first · community-first · mobile-first · cozy but stressful · systems-driven · distinctly Filipino
+**Direction:** management-first · community-first · cozy but stressful · systems-driven · distinctly Filipino
 
 ---
 
@@ -65,7 +54,7 @@ Observe → Forecast → Prep → Serve → React → Analyze → Improve Tomorr
 **Daily structure:**
 1. Morning briefing
 2. Palengke shopping
-3. Prep phase
+3. Menu planning & prep
 4. Staff assignment
 5. Open shop
 6. Lunch / dinner rushes
@@ -78,14 +67,6 @@ Observe → Forecast → Prep → Serve → React → Analyze → Improve Tomorr
 ### Important Design Decisions
 
 **No full cooking minigame.** The player is always the owner, operator, planner, and manager — NOT manually cooking.
-
-**Mobile-first UX architecture:**
-- Top status bar
-- Center isometric viewer
-- Bottom phase panel
-- Bottom nav (cards, sticky buttons, bottom sheets)
-
-**Camera:** Fixed isometric. Optional 90° rotate buttons. NOT free orbit.
 
 **Restaurant scale:** Small, personal, barangay-scale. Not a giant corporate empire.
 
@@ -133,8 +114,6 @@ Stats: cooking · speed · friendliness · stamina · morale
 
 Hidden traits: hardworking · *Marites* · ex-fast-food worker · stressed easily
 
-FM-inspired analytics: prep time · waste efficiency · rush-hour performance · customer satisfaction
-
 ---
 
 ### Most Important Gameplay Insight
@@ -153,26 +132,10 @@ Player should feel: *"I lost because of MY decisions."*
 |-------|------|
 | Frontend | React + TypeScript + Vite |
 | State | Zustand |
-| 3D | Three.js + React Three Fiber + Drei |
-| UI | Tailwind CSS + Framer Motion |
-| AI (planned) | Google AI Studio / Gemini |
-
-**Three.js purpose:** visualization only — "living dollhouse." NOT physics, advanced animation, or AAA gameplay engine.
-
----
-
-### 3D / Visual Direction
-
-Style: low poly · cozy · warm · stylized · modular · isometric
-
-Assets: lightweight modular low-poly or procedural primitives first. GLB assets from Meshy/Blender in later phases.
+| UI | Tailwind CSS |
 
 ---
 
 ### Emotional Pillars
 
 belonging · routine · survival · food · nostalgia · community · operational pressure
-
----
-
-*Last updated: 2026-05-14*
